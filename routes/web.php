@@ -39,13 +39,7 @@ Route::get('/', function () {
     $total = Visit::select(DB::raw('count(*) as count, SEC_TO_TIME( SUM( TIME_TO_SEC( duration ) ) ) as duration'))
         ->whereDate('visit_date', '>=', Carbon::now()->startOfMonth()->format('Y-m-d'))
         ->whereDate('visit_date', '<=', Carbon::now()->endOfMonth()->format('Y-m-d'))
-        ->get()
-        ->map(function ($item) {
-            return (object)[
-                'count' => $item['count'],
-                'duration' => $item['duration']
-            ];
-        });
+        ->get();
 
     $total = $total->first();
 
