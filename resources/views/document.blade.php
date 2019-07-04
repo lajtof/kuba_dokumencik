@@ -62,14 +62,15 @@
         .table {
             margin-top: 5px;
             width: 100%;
+            border-collapse: collapse;
         }
 
         .table .td {
             width: 25%;
             font-size: 10px;
-            font-weight: 200;
+            font-weight: 400;
             padding: 2px;
-            border: 1px solid black;
+            border: 2px solid black;
         }
 
         .dc table th {
@@ -128,14 +129,26 @@
             <th class="td">Podpis zleceniobiorcy</th>
         </tr>
 
-        @foreach($visit_days as $visit_day)
+        @for( $i = 1; $i <= $date->daysInMonth; $i++ )
             <tr>
-                <td class="td">{{ $visit_day->date }}</td>
-                <td class="td">{{ $visit_day->duration }}</td>
-                <td class="td">{{ $visit_day->count }}</td>
+                <td class="td">{{ $i }}</td>
+                <td class="td">
+                    @if( isset($visit_days[$i]) )
+                        {{ $visit_days[$i]->duration }}
+                    @else
+                        0:00
+                    @endif
+                </td>
+                <td class="td">
+                    @if( isset($visit_days[$i]) )
+                        {{ $visit_days[$i]->count }}
+                    @else
+                        0
+                    @endif
+                </td>
                 <td class="td"></td>
             </tr>
-        @endforeach
+        @endfor
 
         <tr>
             <td class="td"></td>

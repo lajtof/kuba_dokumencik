@@ -8,6 +8,7 @@ Route::get('/', function () {
     $today = Carbon::now()->locale('pl');
     $date = new Collection();
 
+    $date->daysInMonth = $today->daysInMonth;
     $date->month = $today->monthName . ' ('. $today->format('m') . ')';
     $date->year = $today->year;
 
@@ -30,16 +31,19 @@ Route::get('/', function () {
     $user_data->pesel = '19283746501';
     $user_data->nip = '1237890456';
 
-    $visit_days = Visit::select(DB::raw('DATE_FORMAT(visit_date, \'%Y-%m-%d\') as date, count(*) as count, SEC_TO_TIME( SUM( TIME_TO_SEC( duration ) ) ) as duration'))
+    $visit_days = Visit::select(DB::raw('date_format( visit_date, \'%e\' ) as day, count( * ) as count, date_format( sec_to_time( sum( time_to_sec( duration ) ) ), \'%k:%i\' ) as duration'))
         ->whereDate('visit_date', '>=', Carbon::now()->startOfMonth()->format('Y-m-d'))
         ->whereDate('visit_date', '<=', Carbon::now()->endOfMonth()->format('Y-m-d'))
-        ->groupBy('date')
+        ->groupBy('visit_date')
+        ->get()
+        ->keyBy('day');
+
+    $total = Visit::select(DB::raw('count( * ) as count, date_format( sec_to_time( sum( time_to_sec( duration ) ) ), \'%k:%i\' ) as duration'))
+        ->whereDate('visit_date', '>=', Carbon::now()->startOfMonth()->format('Y-m-d'))
+        ->whereDate('visit_date', '<=', Carbon::now()->endOfMonth()->format('Y-m-d'))
         ->get();
 
-    $total = Visit::select(DB::raw('count(*) as count, SEC_TO_TIME( SUM( TIME_TO_SEC( duration ) ) ) as duration'))
-        ->whereDate('visit_date', '>=', Carbon::now()->startOfMonth()->format('Y-m-d'))
-        ->whereDate('visit_date', '<=', Carbon::now()->endOfMonth()->format('Y-m-d'))
-        ->get();
+//    return $visit_days;
 
     $total = $total->first();
 
